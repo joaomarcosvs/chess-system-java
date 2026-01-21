@@ -19,6 +19,7 @@ public class ChessMatch {
 
     private List<Piece> piecesOnTheBoard = new ArrayList<>();
     private List<Piece> capturedPieces = new ArrayList<>();
+    private List<String> moveHistory = new ArrayList<>();
 
     public ChessMatch() {
         board = new Board(8, 8);
@@ -42,6 +43,14 @@ public class ChessMatch {
 
     public boolean getCheckMate(){
         return checkMate;
+    }
+
+    public List<String> getMoveHistory() {
+        return new ArrayList<>(moveHistory);
+    }
+
+    public Color getOpponentPlayer() {
+        return opponent(currentPlayer);
     }
 
     // retorna matriz de peças da partida de xadrez
@@ -69,6 +78,7 @@ public class ChessMatch {
         validateTargetPosition(source, target);
 
         Piece capturedPiece =  makeMove(source, target);
+        ChessPiece movedPiece = (ChessPiece) board.piece(target);
 
         if (testCheck(currentPlayer)) {
             undoMove(source, target, capturedPiece);
@@ -80,7 +90,10 @@ public class ChessMatch {
         if (testChackMate(opponent(currentPlayer))) {
             checkMate = true;
         }
-        else {
+
+        registerMove(source, target, movedPiece, capturedPiece, check, checkMate);
+
+        if (!checkMate) {
             nextTurn();
         }
 
@@ -121,6 +134,26 @@ public class ChessMatch {
     private void placeNewPiece(char column, int row, ChessPiece piece){
         board.placePiece(piece, new ChessPosition(column, row).toPosition()); // coloca a peça no tabuleiro
         piecesOnTheBoard.add(piece); // coloca na lista de peças no tabuleiro
+    }
+
+    private void registerMove(Position source, Position target, ChessPiece movedPiece, Piece capturedPiece, boolean check, boolean checkMate) {
+        ChessPosition sourcePos = ChessPosition.fromPosition(source);
+        ChessPosition targetPos = ChessPosition.fromPosition(target);
+        StringBuilder sb = new StringBuilder();
+        sb.append(turn).append(". ").append(currentPlayer).append(": ");
+        sb.append(movedPiece).append(" ");
+        sb.append(sourcePos);
+        sb.append(capturedPiece != null ? "x" : "-");
+        sb.append(targetPos);
+        if (capturedPiece != null) {
+            sb.append(" (").append(capturedPiece).append(")");
+        }
+        if (checkMate) {
+            sb.append(" #");
+        } else if (check) {
+            sb.append(" +");
+        }
+        moveHistory.add(sb.toString());
     }
 
     private Color opponent(Color color){ // verifica a cor do oponente

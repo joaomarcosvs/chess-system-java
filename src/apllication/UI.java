@@ -57,17 +57,20 @@ public class UI {
         System.out.println();
         printCapturedPieces(captured);
         System.out.println();
+        printMoveHistory(chessMatch.getMoveHistory());
+        System.out.println();
         System.out.println("Turn: " +  chessMatch.getTurn());
 
         if (!chessMatch.getCheckMate()){
             System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
             if (chessMatch.getCheck()){
-                System.out.println("CHECK!");
+                System.out.println("CHECK! " + chessMatch.getCurrentPlayer() + " is in check.");
             }
         }
         else {
             System.out.println("CHECKMATE!");
             System.out.println("Winner: " + chessMatch.getCurrentPlayer());
+            System.out.println("Defeated: " + chessMatch.getOpponentPlayer());
         }
     }
 
@@ -126,5 +129,16 @@ public class UI {
         System.out.print(ANSI_YELLOW);
         System.out.println(Arrays.toString(black.toArray())); // padrão para imprimir array
         System.out.print(ANSI_RESET);
+    }
+
+    private static void printMoveHistory(List<String> history) {
+        System.out.println("Move history:");
+        if (history.isEmpty()) {
+            System.out.println("(no moves yet)");
+            return;
+        }
+        for (String move : history) {
+            System.out.println(move);
+        }
     }
 }
